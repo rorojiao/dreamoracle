@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DreamOracle 🌙 | Dream Meaning & Interpretation</title>
+  <meta name="description" content="DreamOracle helps you explore dream meanings with psychological and cultural interpretations. Search symbols, keep a dream journal, and get a daily prompt." />
+  <link rel="stylesheet" href="./assets/css/styles.css" />
+</head>
+<body>
+  <div class="sky" aria-hidden="true"><div class="twinkle"></div></div>
+  <div class="moon" aria-hidden="true"></div>
+
+  <header class="header">
+    <div class="container">
+      <nav class="nav" aria-label="Primary">
+        <a class="brand" href="./index.html">
+          <span class="name">DreamOracle</span>
+          <span class="tag" data-i18n="brand_tag">Dream meaning &amp; interpretation</span>
+        </a>
+        <div class="navlinks">
+          <a class="pill" data-nav="home" href="./index.html" data-i18n="nav_home">Home</a>
+          <a class="pill" data-nav="search" href="./search.html" data-i18n="nav_search">Search</a>
+          <a class="pill" data-nav="journal" href="./journal.html" data-i18n="nav_journal">Journal</a>
+          <a class="pill" data-nav="random" href="./random.html" data-i18n="nav_random">Daily Dream</a>
+          <button class="btn secondary" type="button" data-lang-toggle data-i18n-title="nav_lang" title="中文">中文</button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="container">
+      <section class="center">
+        <div class="card searchbox fade-in">
+          <div class="hero">
+            <h1 data-i18n="home_title">DreamOracle</h1>
+            <p data-i18n="home_sub">Search dream symbols, log your dreams, and explore gentle interpretations rooted in psychology and culture.</p>
+          </div>
+
+          <form class="field" action="./search.html" method="get">
+            <input class="input" name="q" autocomplete="off" spellcheck="false" data-i18n="home_placeholder" data-i18n-placeholder placeholder="Try: flying, falling, water, snake, teeth…" />
+            <button class="btn" type="submit" data-i18n="home_go">Interpret</button>
+          </form>
+
+          <div class="chips" aria-label="Examples">
+            <a class="chip" href="./search.html?q=flying">flying</a>
+            <a class="chip" href="./search.html?q=falling">falling</a>
+            <a class="chip" href="./search.html?q=water">water</a>
+            <a class="chip" href="./search.html?q=snake">snake</a>
+            <a class="chip" href="./search.html?q=teeth">teeth</a>
+            <a class="chip" href="./search.html?q=chase">chase</a>
+          </div>
+
+          <div class="hr"></div>
+          <div class="small">
+            <span data-i18n="home_hint">Tip: Press</span> <span class="kbd">/</span> <span data-i18n="home_hint2">to search quickly.</span>
+            <span style="margin-left:10px" class="badge" data-i18n="disclaimer">Note: Interpretations are reflective prompts, not medical advice.</span>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="row">
+        <div>
+          <div><strong>DreamOracle</strong> - <span data-i18n="brand_tag">Dream meaning &amp; interpretation</span></div>
+          <div style="margin-top:6px">Copyright (c) <span id="y"></span></div>
+        </div>
+        <div class="donate">
+          <div><strong data-i18n="donate_title">Support</strong></div>
+          <div style="margin-top:6px">
+            <span data-i18n="donate_text">If DreamOracle helped you, you can tip via</span>
+          </div>
+          <div style="margin-top:8px; display:flex; gap:10px; flex-wrap:wrap; align-items:center">
+            <code data-donate-addr>0xEeD903787Cb86bcCc17777E5C7d10A4c2De43823</code>
+            <button class="btn secondary" type="button" data-donate-copy data-i18n="donate_copy">Copy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="./assets/js/app.js"></script>
+  <script>
+    document.getElementById('y').textContent = String(new Date().getFullYear());
+    // quick focus with '/' like many search sites
+    window.addEventListener('keydown', (e) => {
+      if (e.key === '/' && !e.metaKey && !e.ctrlKey && !e.altKey) {
+        const el = document.querySelector('input[name="q"]');
+        if (el && document.activeElement !== el) {
+          e.preventDefault();
+          el.focus();
+        }
+      }
+    });
+  </script>
+</body>
+</html>

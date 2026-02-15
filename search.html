@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DreamOracle 🌙 | Dream Meaning Search</title>
+  <meta name="description" content="Search 200+ common dream symbols and get psychological and cultural interpretations." />
+  <link rel="stylesheet" href="./assets/css/styles.css" />
+</head>
+<body>
+  <div class="sky" aria-hidden="true"><div class="twinkle"></div></div>
+  <div class="moon" aria-hidden="true"></div>
+
+  <header class="header">
+    <div class="container">
+      <nav class="nav" aria-label="Primary">
+        <a class="brand" href="./index.html">
+          <span class="name">DreamOracle</span>
+          <span class="tag" data-i18n="brand_tag">Dream meaning &amp; interpretation</span>
+        </a>
+        <div class="navlinks">
+          <a class="pill" data-nav="home" href="./index.html" data-i18n="nav_home">Home</a>
+          <a class="pill" data-nav="search" href="./search.html" data-i18n="nav_search">Search</a>
+          <a class="pill" data-nav="journal" href="./journal.html" data-i18n="nav_journal">Journal</a>
+          <a class="pill" data-nav="random" href="./random.html" data-i18n="nav_random">Daily Dream</a>
+          <button class="btn secondary" type="button" data-lang-toggle data-i18n-title="nav_lang" title="中文">中文</button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="container">
+      <section class="grid">
+        <div class="card searchbox fade-in">
+          <div class="hero" style="padding-top:18px">
+            <h1 data-i18n="search_title">Dream Meaning Search</h1>
+            <p data-i18n="search_sub">Type a symbol or theme. We match common dream symbols and provide a psychological reading plus a cultural angle.</p>
+          </div>
+
+          <form class="field" id="searchForm">
+            <input class="input" id="q" name="q" autocomplete="off" spellcheck="false" data-i18n="search_placeholder" data-i18n-placeholder placeholder="Enter a keyword (e.g., flying)" />
+            <button class="btn" type="submit" data-i18n="home_go">Interpret</button>
+          </form>
+
+          <div class="chips" id="chips" aria-label="Examples">
+            <span class="small" style="margin-right:6px" data-i18n="search_examples">Popular:</span>
+            <button class="chip" type="button" data-q="flying">flying</button>
+            <button class="chip" type="button" data-q="falling">falling</button>
+            <button class="chip" type="button" data-q="water">water</button>
+            <button class="chip" type="button" data-q="snake">snake</button>
+            <button class="chip" type="button" data-q="teeth">teeth</button>
+            <button class="chip" type="button" data-q="chase">chase</button>
+            <button class="chip" type="button" data-q="death">death</button>
+            <button class="chip" type="button" data-q="baby">baby</button>
+          </div>
+
+          <div class="hr"></div>
+          <div class="small"><span class="badge" id="count">0</span> <span data-i18n="search_count">Results</span></div>
+
+          <div class="results" id="results" aria-live="polite"></div>
+          <div id="empty" class="notice" style="display:none; margin-top:14px" data-i18n="search_empty">No matches. Try a broader keyword, or a synonym.</div>
+        </div>
+
+        <aside class="section">
+          <div class="card form fade-in" style="padding:18px">
+            <h2 style="margin:0">DreamOracle</h2>
+            <p style="margin:10px 0 0" data-i18n="disclaimer">Note: Interpretations are reflective prompts, not medical advice.</p>
+            <div class="hr"></div>
+            <p style="margin:0">200+ symbols. EN + 中文.</p>
+            <p style="margin:10px 0 0" class="small">Try combining themes: "water + storm", "snake + bite".</p>
+          </div>
+        </aside>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="row">
+        <div>
+          <div><strong>DreamOracle</strong> - <span data-i18n="brand_tag">Dream meaning &amp; interpretation</span></div>
+        </div>
+        <div class="donate">
+          <div><strong data-i18n="donate_title">Support</strong></div>
+          <div style="margin-top:8px; display:flex; gap:10px; flex-wrap:wrap; align-items:center">
+            <code data-donate-addr>0xEeD903787Cb86bcCc17777E5C7d10A4c2De43823</code>
+            <button class="btn secondary" type="button" data-donate-copy data-i18n="donate_copy">Copy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="./assets/js/app.js"></script>
+  <script>
+    const $q = document.getElementById('q');
+    const $results = document.getElementById('results');
+    const $empty = document.getElementById('empty');
+    const $count = document.getElementById('count');
+    const $form = document.getElementById('searchForm');
+
+    function card(symbol, lang) {
+      const name = lang === 'zh' ? symbol.name_zh : symbol.name_en;
+      const kw = lang === 'zh' ? symbol.keywords_zh : symbol.keywords_en;
+      const psych = lang === 'zh' ? symbol.psych_zh : symbol.psych_en;
+      const culture = lang === 'zh' ? symbol.culture_zh : symbol.culture_en;
+      const meta = (lang === 'zh' ? symbol.key : symbol.key) + (kw && kw.length ? ' · ' + kw.slice(0, 5).join(', ') : '');
+      return `
+        <article class="symbol fade-in">
+          <h3>${DO.escapeHtml(name)}</h3>
+          <div class="meta">${DO.escapeHtml(meta)}</div>
+          <div class="cols">
+            <div>
+              <div class="label">${DO.escapeHtml(DO.t('label_psych'))}</div>
+              <div class="text">${DO.escapeHtml(psych)}</div>
+            </div>
+            <div>
+              <div class="label">${DO.escapeHtml(DO.t('label_culture'))}</div>
+              <div class="text">${DO.escapeHtml(culture)}</div>
+            </div>
+            <div>
+              <div class="label">${DO.escapeHtml(DO.t('label_keywords'))}</div>
+              <div class="text">${DO.escapeHtml((kw || []).join(', '))}</div>
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    let SYMBOLS = [];
+
+    function match(symbol, q) {
+      if (!q) return false;
+      const lang = DO.getLang();
+      const hay = [
+        symbol.key,
+        symbol.name_en,
+        symbol.name_zh,
+        (symbol.keywords_en || []).join(' '),
+        (symbol.keywords_zh || []).join(' '),
+        symbol.psych_en,
+        symbol.psych_zh,
+        symbol.culture_en,
+        symbol.culture_zh
+      ].join(' ').toLowerCase();
+
+      const qq = q.toLowerCase();
+      if (hay.includes(qq)) return true;
+      // simple multi-term matching
+      const parts = qq.split(/\s+/).filter(Boolean);
+      if (parts.length >= 2) {
+        return parts.every(p => hay.includes(p));
+      }
+      return false;
+    }
+
+    function render(q) {
+      const lang = DO.getLang();
+      const nq = DO.normalize(q);
+      const res = nq ? SYMBOLS.filter(s => match(s, nq)).slice(0, 40) : [];
+      $results.innerHTML = res.map(s => card(s, lang)).join('');
+      $count.textContent = String(res.length);
+      $empty.style.display = (nq && res.length === 0) ? 'block' : 'none';
+    }
+
+    function setQuery(q) {
+      $q.value = q;
+      DO.setQs('q', q);
+      render(q);
+    }
+
+    window.addEventListener('dreamoracle:lang', () => render($q.value));
+
+    document.getElementById('chips').addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-q]');
+      if (!btn) return;
+      setQuery(btn.getAttribute('data-q') || '');
+      $q.focus();
+    });
+
+    $form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      setQuery($q.value);
+    });
+
+    (async () => {
+      try {
+        SYMBOLS = await DO.loadSymbols();
+        const start = DO.qs('q');
+        if (start) setQuery(start);
+      } catch (err) {
+        $empty.style.display = 'block';
+        $empty.textContent = String(err && err.message ? err.message : err);
+      }
+    })();
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === '/' && !e.metaKey && !e.ctrlKey && !e.altKey) {
+        if (document.activeElement !== $q) {
+          e.preventDefault();
+          $q.focus();
+        }
+      }
+    });
+  </script>
+</body>
+</html>

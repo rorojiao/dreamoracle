@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DreamOracle 🌙 | Daily Dream</title>
+  <meta name="description" content="A daily random dream symbol with gentle psychological and cultural interpretation." />
+  <link rel="stylesheet" href="./assets/css/styles.css" />
+</head>
+<body>
+  <div class="sky" aria-hidden="true"><div class="twinkle"></div></div>
+  <div class="moon" aria-hidden="true"></div>
+
+  <header class="header">
+    <div class="container">
+      <nav class="nav" aria-label="Primary">
+        <a class="brand" href="./index.html">
+          <span class="name">DreamOracle</span>
+          <span class="tag" data-i18n="brand_tag">Dream meaning &amp; interpretation</span>
+        </a>
+        <div class="navlinks">
+          <a class="pill" data-nav="home" href="./index.html" data-i18n="nav_home">Home</a>
+          <a class="pill" data-nav="search" href="./search.html" data-i18n="nav_search">Search</a>
+          <a class="pill" data-nav="journal" href="./journal.html" data-i18n="nav_journal">Journal</a>
+          <a class="pill" data-nav="random" href="./random.html" data-i18n="nav_random">Daily Dream</a>
+          <button class="btn secondary" type="button" data-lang-toggle data-i18n-title="nav_lang" title="中文">中文</button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="container">
+      <section class="card searchbox fade-in" style="padding:22px">
+        <div class="hero" style="padding-top:18px">
+          <h1 data-i18n="random_title">Daily Dream</h1>
+          <p data-i18n="random_sub">A gentle prompt for reflection. The symbol is randomly selected but consistent for today.</p>
+        </div>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:8px">
+          <button class="btn secondary" type="button" id="refresh" data-i18n="random_refresh">New random</button>
+          <a class="pill" id="toSearch" href="./search.html" data-i18n="nav_search">Search</a>
+        </div>
+
+        <div class="hr"></div>
+        <div id="box"></div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="row">
+        <div>
+          <div><strong>DreamOracle</strong> - <span data-i18n="brand_tag">Dream meaning &amp; interpretation</span></div>
+        </div>
+        <div class="donate">
+          <div><strong data-i18n="donate_title">Support</strong></div>
+          <div style="margin-top:8px; display:flex; gap:10px; flex-wrap:wrap; align-items:center">
+            <code data-donate-addr>0xEeD903787Cb86bcCc17777E5C7d10A4c2De43823</code>
+            <button class="btn secondary" type="button" data-donate-copy data-i18n="donate_copy">Copy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="./assets/js/app.js"></script>
+  <script>
+    const $box = document.getElementById('box');
+    const $refresh = document.getElementById('refresh');
+    const $toSearch = document.getElementById('toSearch');
+
+    function daySeed() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+
+    function hash(s) {
+      let h = 2166136261;
+      for (let i = 0; i < s.length; i++) {
+        h ^= s.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      return (h >>> 0);
+    }
+
+    function pick(symbols, salt) {
+      const seed = hash(daySeed() + ':' + salt);
+      return symbols[seed % symbols.length];
+    }
+
+    function render(symbol) {
+      const lang = DO.getLang();
+      const name = lang === 'zh' ? symbol.name_zh : symbol.name_en;
+      const kw = lang === 'zh' ? symbol.keywords_zh : symbol.keywords_en;
+      const psych = lang === 'zh' ? symbol.psych_zh : symbol.psych_en;
+      const culture = lang === 'zh' ? symbol.culture_zh : symbol.culture_en;
+      $toSearch.href = `./search.html?q=${encodeURIComponent(symbol.key)}`;
+
+      $box.innerHTML = `
+        <article class="symbol fade-in">
+          <h3>${DO.escapeHtml(name)}</h3>
+          <div class="meta">${DO.escapeHtml(symbol.key)}${kw && kw.length ? ' · ' + DO.escapeHtml(kw.slice(0, 6).join(', ')) : ''}</div>
+          <div class="cols">
+            <div>
+              <div class="label">${DO.escapeHtml(DO.t('label_psych'))}</div>
+              <div class="text">${DO.escapeHtml(psych)}</div>
+            </div>
+            <div>
+              <div class="label">${DO.escapeHtml(DO.t('label_culture'))}</div>
+              <div class="text">${DO.escapeHtml(culture)}</div>
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    let SYMBOLS = [];
+    let salt = '0';
+
+    async function boot() {
+      SYMBOLS = await DO.loadSymbols();
+      render(pick(SYMBOLS, salt));
+    }
+
+    window.addEventListener('dreamoracle:lang', () => {
+      if (!SYMBOLS.length) return;
+      render(pick(SYMBOLS, salt));
+    });
+
+    $refresh.addEventListener('click', () => {
+      salt = String(Number(salt) + 1);
+      if (!SYMBOLS.length) return;
+      render(pick(SYMBOLS, salt));
+    });
+
+    boot().catch(err => {
+      $box.textContent = String(err && err.message ? err.message : err);
+    });
+  </script>
+</body>
+</html>

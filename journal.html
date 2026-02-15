@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DreamOracle 🌙 | Dream Journal</title>
+  <meta name="description" content="Private dream journal stored on your device. Browse by date and see common elements." />
+  <link rel="stylesheet" href="./assets/css/styles.css" />
+</head>
+<body>
+  <div class="sky" aria-hidden="true"><div class="twinkle"></div></div>
+  <div class="moon" aria-hidden="true"></div>
+
+  <header class="header">
+    <div class="container">
+      <nav class="nav" aria-label="Primary">
+        <a class="brand" href="./index.html">
+          <span class="name">DreamOracle</span>
+          <span class="tag" data-i18n="brand_tag">Dream meaning &amp; interpretation</span>
+        </a>
+        <div class="navlinks">
+          <a class="pill" data-nav="home" href="./index.html" data-i18n="nav_home">Home</a>
+          <a class="pill" data-nav="search" href="./search.html" data-i18n="nav_search">Search</a>
+          <a class="pill" data-nav="journal" href="./journal.html" data-i18n="nav_journal">Journal</a>
+          <a class="pill" data-nav="random" href="./random.html" data-i18n="nav_random">Daily Dream</a>
+          <button class="btn secondary" type="button" data-lang-toggle data-i18n-title="nav_lang" title="中文">中文</button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="container">
+      <section class="grid">
+        <div class="card form fade-in">
+          <div class="hero" style="padding-top:10px">
+            <h1 data-i18n="journal_title">Dream Journal</h1>
+            <p data-i18n="journal_sub">Write down your dreams while they are fresh. Stored only on this device (localStorage).</p>
+          </div>
+
+          <form id="dreamForm">
+            <label for="date" data-i18n="journal_date">Date</label>
+            <input class="input" id="date" name="date" type="date" required />
+
+            <label for="title" data-i18n="journal_title2">Title (optional)</label>
+            <input class="input" id="title" name="title" type="text" maxlength="90" />
+
+            <label for="text" data-i18n="journal_text">Dream description</label>
+            <textarea class="input textarea" id="text" name="text" required></textarea>
+
+            <div style="display:flex; gap:10px; align-items:center; margin-top:14px; flex-wrap:wrap">
+              <button class="btn" type="submit" data-i18n="journal_save">Save Entry</button>
+              <span id="saved" class="small" style="display:none" data-i18n="journal_saved">Saved.</span>
+              <span class="badge" data-i18n="disclaimer">Note: Interpretations are reflective prompts, not medical advice.</span>
+            </div>
+          </form>
+        </div>
+
+        <aside class="section">
+          <div class="card form fade-in">
+            <h2 data-i18n="journal_stats">Common elements</h2>
+            <div class="small" style="margin-top:8px" id="statsHint"></div>
+            <div class="hr"></div>
+            <div class="bars" id="bars"></div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="section" style="margin-top:18px">
+        <div class="card form fade-in">
+          <h2 data-i18n="journal_list">Entries</h2>
+          <div class="hr"></div>
+          <div id="none" class="notice" style="display:none" data-i18n="journal_none">No entries yet. Add your first dream.</div>
+          <table class="table" id="table" style="display:none">
+            <thead>
+              <tr>
+                <th style="width:110px">Date</th>
+                <th>Title</th>
+                <th>Preview</th>
+                <th style="width:120px">Tags</th>
+                <th style="width:96px"></th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="row">
+        <div>
+          <div><strong>DreamOracle</strong> - <span data-i18n="brand_tag">Dream meaning &amp; interpretation</span></div>
+        </div>
+        <div class="donate">
+          <div><strong data-i18n="donate_title">Support</strong></div>
+          <div style="margin-top:8px; display:flex; gap:10px; flex-wrap:wrap; align-items:center">
+            <code data-donate-addr>0xEeD903787Cb86bcCc17777E5C7d10A4c2De43823</code>
+            <button class="btn secondary" type="button" data-donate-copy data-i18n="donate_copy">Copy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="./assets/js/app.js"></script>
+  <script>
+    const $date = document.getElementById('date');
+    const $title = document.getElementById('title');
+    const $text = document.getElementById('text');
+    const $saved = document.getElementById('saved');
+    const $none = document.getElementById('none');
+    const $table = document.getElementById('table');
+    const $tbody = document.getElementById('tbody');
+    const $bars = document.getElementById('bars');
+    const $statsHint = document.getElementById('statsHint');
+
+    $date.value = DO.todayISO();
+
+    let SYMBOLS = [];
+    let KEYSET = new Set();
+
+    function extractTags(text) {
+      const hay = String(text || '').toLowerCase();
+      const hits = [];
+      for (const k of KEYSET) {
+        if (k.length < 3) continue;
+        if (hay.includes(k)) hits.push(k);
+      }
+      // keep stable, short
+      return hits.slice(0, 8);
+    }
+
+    function fmtEntry(e) {
+      const title = e.title ? e.title : '-';
+      const preview = (e.text || '').replace(/\s+/g, ' ').trim().slice(0, 110);
+      const tags = (e.tags || []).slice(0, 4).join(', ');
+      return `
+        <tr>
+          <td>${DO.escapeHtml(e.date)}</td>
+          <td>${DO.escapeHtml(title)}</td>
+          <td>${DO.escapeHtml(preview)}</td>
+          <td>${DO.escapeHtml(tags)}</td>
+          <td>
+            <button class="btn secondary" type="button" data-del="${DO.escapeHtml(e.id)}" data-i18n="journal_delete">${DO.t('journal_delete')}</button>
+          </td>
+        </tr>
+      `;
+    }
+
+    function renderList() {
+      const entries = DO.readJournal().slice().sort((a,b) => String(b.date).localeCompare(String(a.date)));
+      if (entries.length === 0) {
+        $none.style.display = 'block';
+        $table.style.display = 'none';
+        $tbody.innerHTML = '';
+      } else {
+        $none.style.display = 'none';
+        $table.style.display = 'table';
+        $tbody.innerHTML = entries.map(fmtEntry).join('');
+      }
+      renderStats(entries);
+    }
+
+    function renderStats(entries) {
+      const freq = new Map();
+      for (const e of entries) {
+        for (const t of (e.tags || [])) {
+          freq.set(t, (freq.get(t) || 0) + 1);
+        }
+      }
+      const items = Array.from(freq.entries()).sort((a,b) => b[1] - a[1]).slice(0, 10);
+      const max = items.length ? items[0][1] : 1;
+
+      const lang = DO.getLang();
+      function label(key) {
+        const s = SYMBOLS.find(x => x.key === key);
+        if (!s) return key;
+        return lang === 'zh' ? (s.name_zh || key) : (s.name_en || key);
+      }
+
+      if (entries.length === 0) {
+        $statsHint.textContent = '';
+      } else {
+        $statsHint.textContent = `${entries.length} ${entries.length === 1 ? 'entry' : 'entries'} on this device.`;
+      }
+
+      $bars.innerHTML = items.map(([k,c]) => {
+        const pct = Math.round((c / max) * 100);
+        return `
+          <div class="bar">
+            <div class="name">${DO.escapeHtml(label(k))}</div>
+            <div class="track"><div class="fill" style="width:${pct}%"></div></div>
+            <div class="count">${c}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    document.getElementById('dreamForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const entry = {
+        id: DO.id(),
+        date: $date.value,
+        title: $title.value.trim(),
+        text: $text.value.trim(),
+        tags: extractTags(($title.value || '') + ' ' + ($text.value || '')),
+        createdAt: new Date().toISOString()
+      };
+      const entries = DO.readJournal();
+      entries.push(entry);
+      DO.writeJournal(entries);
+
+      $saved.style.display = 'inline';
+      setTimeout(() => ($saved.style.display = 'none'), 1000);
+
+      $title.value = '';
+      $text.value = '';
+      renderList();
+    });
+
+    $tbody.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-del]');
+      if (!btn) return;
+      const id = btn.getAttribute('data-del');
+      const entries = DO.readJournal().filter(x => x.id !== id);
+      DO.writeJournal(entries);
+      renderList();
+    });
+
+    window.addEventListener('dreamoracle:lang', () => renderList());
+
+    (async () => {
+      try {
+        SYMBOLS = await DO.loadSymbols();
+        KEYSET = new Set(SYMBOLS.map(s => String(s.key || '').toLowerCase()).filter(Boolean));
+      } catch (_) {
+        SYMBOLS = [];
+        KEYSET = new Set();
+      }
+      renderList();
+    })();
+  </script>
+</body>
+</html>

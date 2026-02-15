@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://rorojiao.github.io/dreamoracle/sitemap.xml
